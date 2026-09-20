@@ -29,7 +29,7 @@ jobs:
       run: |
         cd addons/sourcemod/scripting
         sed -i -E 's/^(#define\sMHUD_VERSION\s)"(.*)"$/\1"git-${{ github.sha }}"/' include/movementhud.inc
-        for file in *.sp; do spcomp $file -i "include" -o "../plugins/${file%.*}.smx"; done;
+        for file in *.sp; do spcomp $file -i "include" -i "$includePath" -o "../plugins/${file%.*}.smx"; done;
 
     - name: Prepare artifact
       run : |
