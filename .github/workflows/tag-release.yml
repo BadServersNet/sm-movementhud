@@ -8,13 +8,11 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Setup variables
-      id: vars
-      run: echo ::set-output name=version::${GITHUB_REF#refs/*/}
+    - uses: actions/checkout@v4
 
     - name: Setup SourcePawn Compiler
       id: setup
@@ -33,9 +31,11 @@ jobs:
     - name: Compress plugins
       run : |
         mkdir build
-        zip -r "build/movementhud-${{ steps.vars.outputs.version }}.zip" addons
+        zip -r "build/movementhud-${{ github.ref_name }}.zip" addons
 
     - name: Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
-        files: "build/movementhud-${{ steps.vars.outputs.version }}.zip"
+        files: |
+          build/movementhud-${{ github.ref_name }}.zip
+          addons/sourcemod/plugins/movementhud.smx

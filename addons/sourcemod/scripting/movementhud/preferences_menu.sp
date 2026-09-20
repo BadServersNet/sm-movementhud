@@ -10,7 +10,7 @@ void OnClientPutInServer_PreferencesMenu(int client)
 void DisplayMainMenu(int client)
 {
     Menu menu = new Menu(MenuHandler_Main);
-    menu.SetTitle("MovementHUD %.20s\n%s\n ", MHUD_VERSION, MHUD_SOURCE_URL);
+    menu.SetTitle("MHUD Preferences\n ");
 
     menu.AddItem("1", "Simple preferences");
     menu.AddItem("2", "Advanced preferences");
@@ -26,7 +26,7 @@ void DisplayPreferencesMenu(int client, bool advanced, bool fromMainMenu = false
     gB_FromMainMenu[client] = fromMainMenu;
 
     Menu menu = new Menu(MenuHandler_Preferences);
-    menu.SetTitle("MovementHUD %.20s\n%s\n ", MHUD_VERSION, MHUD_SOURCE_URL);
+    menu.SetTitle("MHUD Preferences\n ");
 
     for (int i = 0; i < g_Preferences.Length; i++)
     {
