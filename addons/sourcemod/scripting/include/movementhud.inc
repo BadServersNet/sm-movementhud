@@ -12,7 +12,7 @@
 #define MHUD_TAG_RAW "[MovementHUD]"
 #define MHUD_TAG_COLOR "[\x0CMovementHUD\x01]"
 
-#define MHUD_VERSION "3.0.1-LoB12-bs1"
+#define MHUD_VERSION "3.1.0"
 #define MHUD_SOURCE_URL "https://github.com/zer0k-z/MovementHUD"
 
 typeset MHudPreferenceInputHandler

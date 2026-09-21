@@ -19,10 +19,10 @@ static const char Modes[KeysMode_COUNT][] =
 
 static const char SpacingModes[KeysSpaceMode_COUNT][] =
 {
-    "1080p FS",
-    "1440p resized",
-    "1440p native",
-    "Legacy"
+    "Aligned - 1080p",
+    "Aligned - 1080p on 1440p monitor",
+    "Aligned - 1440p",
+    "Plain spaces"
 };
 
 static const char KeysColors[SpeedKeyColor_COUNT][] =
@@ -36,8 +36,8 @@ static const char KeysColors[SpeedKeyColor_COUNT][] =
 static const char KeysStyle[KeysMouseStyle_COUNT][] = 
 {
     "Disabled",
-    "Style 1",
-    "Style 2"
+    "Arrows beside keys",
+    "Arrows on middle row"
 }
 
 void OnPluginStart_Elements_Mode_Keys()
@@ -54,7 +54,7 @@ void OnPluginStart_Elements_Other_Keys()
     KeysOverlapColor = new MHudRGBPreference("keys_color_overlap", "Keys - Overlap Color", 255, 0, 0);
     KeysMouseDirection = new MHudEnumPreference("keys_mouse_direction", "Keys - Mouse Direction", KeysStyle, sizeof(KeysStyle) - 1, KeyMouseStyle_Disabled);
     KeysColorBySpeed = new MHudEnumPreference("keys_color_by_speed", "Keys - Color by Speed", KeysColors, sizeof(KeysColors) - 1, SpeedKeyColor_None);
-    KeysSpaceMode = new MHudEnumPreference("keys_spacing_mode", "Keys - Spacing Mode", SpacingModes, sizeof(SpacingModes) - 1, KeysSpaceMode_NativeHD);
+    KeysSpaceMode = new MHudEnumPreference("keys_spacing_mode", "Keys - Spacing Mode", SpacingModes, sizeof(SpacingModes) - 1, KeysSpaceMode_Legacy);
 
     KeysGainColor = new MHudRGBPreference("keys_color_gain", "Keys - Gain Color", 0, 255, 0);
     KeysLossColor = new MHudRGBPreference("keys_color_loss", "Keys - Loss Color", 255, 0, 0);
@@ -151,10 +151,10 @@ void OnGameFrame_Element_Keys(int client, int target)
 
     int mouseDirectionStyle = KeysMouseDirection.GetInt(client);
     bool legacy = KeysSpaceMode.GetInt(client) == KeysSpaceMode_Legacy;
-    char blank[2] = "";
+    char blank[4] = "—";
     if (mode == KeysMode_NoBlanks)
     {
-        Format(blank, sizeof(blank), "—");
+        Format(blank, sizeof(blank), "  ");
     }
     switch (mouseDirectionStyle)
     {
@@ -188,19 +188,6 @@ void OnGameFrame_Element_Keys(int client, int target)
             int mouseX = gI_MouseX[target];
             if (legacy)
             {
-                ShowSyncHudText(client, HudSync, "%s%s%s\n%s%s%s%s%s",
-                    GetKeyString(Char_Crouch, mode, spaceMode, !!(buttons & IN_DUCK)),
-                    GetKeyString(Char_W, mode, spaceMode, !!(buttons & IN_FORWARD)),
-                    GetKeyString(Char_Jump, mode, spaceMode, showJump),
-                    GetKeyString(Char_ArrLeft, mode, spaceMode, mouseX < 0),
-                    GetKeyString(Char_A, mode, spaceMode, !!(buttons & IN_MOVELEFT)),
-                    GetKeyString(Char_S, mode, spaceMode, !!(buttons & IN_BACK)),
-                    GetKeyString(Char_D, mode, spaceMode, !!(buttons & IN_MOVERIGHT)),
-                    GetKeyString(Char_ArrRight, mode, spaceMode, mouseX > 0)
-                );
-            }
-            else
-            {
                 ShowSyncHudText(client, HudSync, "%s  %s  %s\n%s %s  %s  %s %s",
                     (buttons & IN_DUCK)       ? "C" : blank,
                     (buttons & IN_FORWARD)    ? "W" : blank,
@@ -212,18 +199,31 @@ void OnGameFrame_Element_Keys(int client, int target)
                     (mouseX > 0)              ? "→" : blank
                 );
             }
+            else
+            {
+                ShowSyncHudText(client, HudSync, "%s%s%s\n%s%s%s%s%s",
+                    GetKeyString(Char_Crouch, mode, spaceMode, !!(buttons & IN_DUCK)),
+                    GetKeyString(Char_W, mode, spaceMode, !!(buttons & IN_FORWARD)),
+                    GetKeyString(Char_Jump, mode, spaceMode, showJump),
+                    GetKeyString(Char_ArrLeft, mode, spaceMode, mouseX < 0),
+                    GetKeyString(Char_A, mode, spaceMode, !!(buttons & IN_MOVELEFT)),
+                    GetKeyString(Char_S, mode, spaceMode, !!(buttons & IN_BACK)),
+                    GetKeyString(Char_D, mode, spaceMode, !!(buttons & IN_MOVERIGHT)),
+                    GetKeyString(Char_ArrRight, mode, spaceMode, mouseX > 0)
+                );
+            }
         }
         case KeysMouseStyle_Line:
         {
             int mouseX = gI_MouseX[target];
             if (legacy)
             {
-                ShowSyncHudText(client, HudSync, "%s%s%s\n%s%s%s\n%s%s%s",
+                ShowSyncHudText(client, HudSync, "%s  %s  %s\n%s  %s  %s\n%s  %s  %s",
                     (buttons & IN_DUCK)       ? "C" : blank,
                     (buttons & IN_FORWARD)    ? "W" : blank,
                     (showJump)                ? "J" : blank,
                     (mouseX < 0)              ? "←" : blank,
-                    GetKeyString(Char_Jump, KeysMode_NoBlanks, spaceMode, false), // Key doesn't matter.
+                    "  ",
                     (mouseX > 0)              ? "→" : blank,
                     (buttons & IN_MOVELEFT)   ? "A" : blank,
                     (buttons & IN_BACK)       ? "S" : blank,
