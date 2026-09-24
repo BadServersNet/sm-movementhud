@@ -1,4 +1,5 @@
 static int CurrentRevision = 3;
+static int MaxCodeLength = 240;
 static ArrayList PreferencesInCode;
 
 void OnPluginStart_PreferencesCode()
@@ -45,9 +46,27 @@ void OnPluginStart_PreferencesCode()
 
 void GeneratePreferencesCode(int client, char[] buffer, int maxlength)
 {
+    char json[512];
+
+    for (int count = PreferencesInCode.Length; count > 0; count--)
+    {
+        EncodePreferencesJson(client, count, json, sizeof(json));
+
+        int codeLength = GetBase64Length(strlen(json));
+        if (codeLength <= MaxCodeLength)
+        {
+            break;
+        }
+    }
+
+    EncodeBase64(buffer, maxlength, json);
+}
+
+static void EncodePreferencesJson(int client, int count, char[] buffer, int maxlength)
+{
     JSON_Array hData = new JSON_Array(JSON_Type_String);
 
-    for (int i = 0; i < PreferencesInCode.Length; i++)
+    for (int i = 0; i < count; i++)
     {
         MHudPreference preference = PreferencesInCode.Get(i);
 
@@ -61,11 +80,15 @@ void GeneratePreferencesCode(int client, char[] buffer, int maxlength)
     hObj.SetInt("rev", CurrentRevision);
     hObj.SetObject("data", hData);
 
-    char json[256];
-    hObj.Encode(json, sizeof(json));
-
-    EncodeBase64(buffer, maxlength, json);
+    hObj.Encode(buffer, maxlength);
     json_cleanup_and_delete(hObj);
+}
+
+static int GetBase64Length(int length)
+{
+    int groups = (length + 2) / 3;
+
+    return groups * 4;
 }
 
 bool LoadFromPreferencesCode(int client, const char[] code)
